@@ -114,7 +114,7 @@ class MusinsaItemsSpider(scrapy.Spider):
             next_pg = cur_pg + 1
             yield scrapy.Request(self.__get_url(cate, page=next_pg),
                     callback=self.parse,
-                    meta={'delay_http_codes': {403: 200}, 'max_retries_http_codes': {403: 4}})
+                    meta={'delay_http_codes': {403: 250}, 'max_retries_http_codes': {403: 4}})
         elif cur_pg == total_pg:
             self.logger.info("Parsed all %d pages (%s)", total_pg, self.own_ids)
 

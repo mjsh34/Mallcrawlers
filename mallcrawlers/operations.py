@@ -1,7 +1,12 @@
 import scrapy
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerRunner
 from scrapy.utils.log import configure_logging
 from scrapy.utils.project import get_project_settings
+from scrapy.utils.reactor import install_reactor
+
+# https://docs.scrapy.org/en/latest/topics/asyncio.html#handling-a-pre-installed-reactor
+install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")
+from twisted.internet import reactor, defer
 
 import argparse
 import sys
@@ -48,28 +53,32 @@ def operation__crawl_musinsa_items():
     settings = {**get_project_settings(), 'LOG_LEVEL': 'DEBUG'}
     configure_logging(settings)
 
-    from mallcrawlers.spiders import MusinsaItemsSpider
-    for i, cate_d in enumerate(cates_to_crawl):
-        own_id = cate_d['own_id']
-        out_csv = str(out_dir_path / "musinsa__items_{}.csv".format(own_id))
-        print("[{}/{}] Crawl {} ({}).".format(i+1, len(cates_to_crawl), own_id, cate_d))
-        print("Output will be saved to: '{}'".format(out_csv))
-        process = CrawlerProcess({**settings, 
-                'FEEDS': {
-                    out_csv: {'format': 'csv'},
-                },
-            })
-        process.crawl(MusinsaItemsSpider, own_ids=str(own_id),
-                item_categories_csv=args.item_categories_csv, all_only=args.from_all_category, 
-                sort_by=args.sort_by, sub_sort=args.sub_sort_arg)
-        process.start(stop_after_crawl=True)
-        process.join()
-        if i < len(cates_to_crawl) - 1:
-            sleepsecs = random.uniform(0.8, 1.2) * 600
-            print("Done crawling {} [{}/{}]. Sleep {}s.".format(own_id, i+1, len(cates_to_crawl), sleepsecs))
-            time.sleep(sleepsecs)
-        else:
-            print("Done crawling {} [{}/{}].".format(own_id, i+1, len(cates_to_crawl)))
+    @defer.inlineCallbacks
+    def crawl():
+        from mallcrawlers.spiders import MusinsaItemsSpider
+        for i, cate_d in enumerate(cates_to_crawl):
+            own_id = cate_d['own_id']
+            out_csv = str(out_dir_path / "musinsa__items_{}.csv".format(own_id))
+            print("[{}/{}] Crawl {} ({}).".format(i+1, len(cates_to_crawl), own_id, cate_d))
+            print("Output will be saved to: '{}'".format(out_csv))
+            process = CrawlerRunner({**settings, 
+                    'FEEDS': {
+                        out_csv: {'format': 'csv'},
+                    },
+                })
+            yield process.crawl(MusinsaItemsSpider, own_ids=str(own_id),
+                    item_categories_csv=args.item_categories_csv, all_only=args.from_all_category, 
+                    sort_by=args.sort_by, sub_sort=args.sub_sort_arg)
+            if i < len(cates_to_crawl) - 1:
+                sleepsecs = random.uniform(0.8, 1.2) * 900
+                print("Done crawling {} [{}/{}]. Wait {}s.".format(own_id, i+1, len(cates_to_crawl), sleepsecs))
+                time.sleep(sleepsecs)
+            else:
+                print("Done crawling {} [{}/{}].".format(own_id, i+1, len(cates_to_crawl)))
+        reactor.stop()
+
+    crawl()
+    reactor.run()
 
 
 if __name__ == '__main__':
