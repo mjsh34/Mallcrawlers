@@ -2,3 +2,6 @@
 .venv/
 *.sw*
 *.DS_Store/
+logs/
+/mallcrawlers/out/
+__pycache__/
