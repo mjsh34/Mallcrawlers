@@ -16,7 +16,8 @@ class MusinsaItemsSpider(scrapy.Spider):
     #    "DOWNLOAD_DELAY": 1.5,
     #}
 
-    def __init__(self, item_categories_csv="./musinsa__item_categories.csv", own_ids=None, all_only=False, sort_by='price_high', sub_sort=None, **kw):
+    def __init__(self, item_categories_csv="./musinsa__item_categories.csv", own_ids=None,
+            all_only=False, sort_by='price_high', sub_sort=None, delay_on_403=200, **kw):
         own_ids_str = own_ids
         self.sort_by = sort_by
         if sort_by == 'sale_high':
@@ -59,6 +60,7 @@ class MusinsaItemsSpider(scrapy.Spider):
             self.logger.debug("Start url %d: %s", i+1, url)
             start_urls.append(url)
         self.start_urls = start_urls
+        self.delay_on_403 = delay_on_403
         super().__init__(**kw)
 
     def start_requests(self):
@@ -114,7 +116,7 @@ class MusinsaItemsSpider(scrapy.Spider):
             next_pg = cur_pg + 1
             yield scrapy.Request(self.__get_url(cate, page=next_pg),
                     callback=self.parse,
-                    meta={'delay_http_codes': {403: 250}, 'max_retries_http_codes': {403: 4}})
+                    meta={'delay_http_codes': {403: self.delay_on_403}, 'max_retries_http_codes': {403: 4}})
         elif cur_pg == total_pg:
             self.logger.info("Parsed all %d pages (%s)", total_pg, self.own_ids)
 

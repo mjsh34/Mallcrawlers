@@ -29,7 +29,8 @@ For each row of `categoryCode` inside `./musinsa__item_categories.csv` produced 
 
 Crawl all categories (`python mallcrawlers/operations.py crawl_musinsa_items -h` for help):
 ```sh
-python mallcrawlers/operations.py crawl_musinsa_items -o ./out/musinsa/musinsa_items/ -i mallcrawlers/musinsa__item_categories.csv --sort_by pop_category 2>&1 | tee -a logs/musinsa_items.txt
+cd mallcrawlers/  # IF THIS STEP IS OMITTED SETTINGS WILL NOT LOAD PROPERLY
+python operations.py crawl_musinsa_items -o ./out/musinsa/musinsa_items/ -i ./musinsa__item_categories.csv --sort_by pop_category 2>&1 | tee -a logs/musinsa_items.txt
 ```
 Note: As of March 2024 it does not seem possible to crawl past page 400.
  

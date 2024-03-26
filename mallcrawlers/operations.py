@@ -32,6 +32,8 @@ def operation__crawl_musinsa_items():
     ap.add_argument('--sort_by', default='pop_category')
     ap.add_argument('--sub_sort_arg', default='')
     ap.add_argument('--from_all_category', action='store_true')
+    ap.add_argument('--delay_between_categories', type=float, default=800, help="In seconds")
+    ap.add_argument('--delay_on_403', type=float, default=200, help="In seconds")
     args = ap.parse_args()
 
     print("Item categories CSV: '{}'".format(args.item_categories_csv))
@@ -68,9 +70,9 @@ def operation__crawl_musinsa_items():
                 })
             yield process.crawl(MusinsaItemsSpider, own_ids=str(own_id),
                     item_categories_csv=args.item_categories_csv, all_only=args.from_all_category, 
-                    sort_by=args.sort_by, sub_sort=args.sub_sort_arg)
+                    sort_by=args.sort_by, sub_sort=args.sub_sort_arg, delay_on_403=args.delay_on_403)
             if i < len(cates_to_crawl) - 1:
-                sleepsecs = random.uniform(0.8, 1.2) * 900
+                sleepsecs = random.uniform(0.8, 1.2) * args.delay_between_categories
                 print("Done crawling {} [{}/{}]. Wait {}s.".format(own_id, i+1, len(cates_to_crawl), sleepsecs))
                 time.sleep(sleepsecs)
             else:
