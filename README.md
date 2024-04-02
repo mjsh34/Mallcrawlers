@@ -4,9 +4,10 @@
 - `scrapy==2.11.1`
 - `pyyaml` (6.0.1)
 
-### For prototyping
+### For prototype
 - `requests` (2.31.0)
 - `jupyterlab` (4.1.5)
+- `beautifulsoup4` (4.12.2)
 
 # Crawl
 ## Musinsa
@@ -30,7 +31,7 @@ For each row of `categoryCode` inside `./musinsa__item_categories.csv` produced 
 Crawl all categories (`python mallcrawlers/operations.py crawl_musinsa_items -h` for help):
 ```sh
 cd mallcrawlers/  # IF THIS STEP IS OMITTED SETTINGS WILL NOT LOAD PROPERLY
-python operations.py crawl_musinsa_items -o ./out/musinsa/musinsa_items/ -i ./musinsa__item_categories.csv --sort_by pop_category 2>&1 | tee -a logs/musinsa_items.txt
+python operations.py crawl_musinsa_items -o ./out/musinsa/musinsa_items/ -i ./musinsa__item_categories.csv --sort_by pop_category 2>&1 | tee -a log_musinsa_items.txt
 ```
 Note: As of March 2024 it does not seem possible to crawl past page 400.
  
@@ -40,3 +41,20 @@ Alternatively, using `scrapy crawl` command:
 cd mallcrawlers
 scrapy crawl musinsa__items -O ./musinsa__items_19.csv -a "item_categories_csv=musinsa__item_categories.csv" -a own_ids=19 -a all_only=yes -a sort_by=pop_category -L DEBUG 2>&1 | tee -a logfile.txt
 ```
+
+### Step 3. Scrape detailed item info and reviews
+Scrape item details and reviews from an item list downloaded in Step 2 (`./out/musinsa/musinsa_items/musinsa__items_1.csv`):
+```sh
+cd mallcrawlers/
+scrapy crawl musinsa__item_details -a csv_path_or_dir=out/musinsa/musinsa_items/musinsa__items_1.csv -a review_page_limit=5 -a "review_order=유용한 순" 2>&1 | tee -a log_reviews.txt
+```
+
+`review_order` must be one of:
+- "유용한 순"
+- "최신순"
+- "댓글순"
+- "높은 평점 순"
+- "낮은 평점 순"
+
+- [ ] TODO implement way to store scraped review data
+

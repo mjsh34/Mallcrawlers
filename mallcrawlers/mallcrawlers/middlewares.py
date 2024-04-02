@@ -4,6 +4,7 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.exceptions import IgnoreRequest
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -91,6 +92,7 @@ class MallcrawlersDownloaderMiddleware:
         # Pause scraper and retry on error codes such as 403
         # ref: https://github.com/scrapy/scrapy/blob/02b97f98e74a994ad3e4d74e7ed55207e508a576/scrapy/downloadermiddlewares/retry.py#L145
         delay_d = request.meta.get('delay_http_codes', None)
+        skip_d = request.meta.get('skip_http_cods', None)
         if delay_d is not None and response.status in delay_d:
             delay_base = delay_d[response.status]
             retry_count = self.__retry_counts_d.get(request.url, 0)
@@ -111,6 +113,8 @@ class MallcrawlersDownloaderMiddleware:
             else:
                 spider.logger.error("Gave up retrying for '%s' after %d tries", request.url, retry_count)
                 return response
+        elif skip_d is not None and response.status in skip_d:
+            raise IgnoreRequest()
         else:
             return response
 

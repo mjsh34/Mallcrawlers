@@ -1,7 +1,6 @@
 from mallcrawlers.items import MusinsaItemItem
 
 import scrapy
-from scrapy.utils.reactor import install_reactor
 
 import csv
 from urllib.parse import urlparse

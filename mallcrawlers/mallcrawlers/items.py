@@ -4,6 +4,9 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy import Item, Field
+
+import json
 
 
 #class MallcrawlersItem(scrapy.Item):
@@ -12,7 +15,7 @@ import scrapy
 #    pass
 
 
-class DictWrapperItem(scrapy.Item):
+class DictWrapperItem(Item):
     """
     Initialize item from dict.
     Set values of item as with a dict.
@@ -34,3 +37,17 @@ class MusinsaItemCategoryItem(DictWrapperItem):
 
 class MusinsaItemItem(DictWrapperItem):
     pass
+
+
+#class MusinsaItemDetailsItem(scrapy.Item):
+#    stateall = Field(serializer=json.dumps)
+#    stateallv2 = Field(serializer=json.dumps)
+#    essential = Field(serializeer=json.dumps)
+#    actualsize = Field(serializer=json.dumps)
+class MusinsaItemDetailsItem(DictWrapperItem):
+    pass
+
+
+class MusinsaItemReviewItem(DictWrapperItem):
+    pass
+
