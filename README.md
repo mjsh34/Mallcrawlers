@@ -36,25 +36,32 @@ python operations.py crawl_musinsa_items -o ./out/musinsa/musinsa_items/ -i ./mu
 Note: As of March 2024 it does not seem possible to crawl past page 400.
  
 Alternatively, using `scrapy crawl` command:
-```su
+```sh
 # Crawl category 19 from `./mallcrawlers/musinsa__item_categories.csv`, from '전체' child category (via `-a all_only=yes`) sorted by "무신사 추천순" (via `-a sort_by=pop_category`).
 cd mallcrawlers
 scrapy crawl musinsa__items -O ./musinsa__items_19.csv -a "item_categories_csv=musinsa__item_categories.csv" -a own_ids=19 -a all_only=yes -a sort_by=pop_category -L DEBUG 2>&1 | tee -a logfile.txt
 ```
 
 ### Step 3. Scrape detailed item info and reviews
-Scrape item details and reviews from an item list downloaded in Step 2 (`./out/musinsa/musinsa_items/musinsa__items_1.csv`):
+Scrape item details and reviews from item lists downloaded in Step 2 (csvs inside `./out/musinsa/musinsa_items/`).
+We are using a database type of PostgreSQL hosted locally here.
+[JOBDIR](https://docs.scrapy.org/en/latest/topics/jobs.html) is set to a (initially empty) folder such that seen requests will be skipped in case the spider is stopped and restarted.
 ```sh
 cd mallcrawlers/
-scrapy crawl musinsa__item_details -a csv_path_or_dir=out/musinsa/musinsa_items/musinsa__items_1.csv -a review_page_limit=5 -a "review_order=유용한 순" 2>&1 | tee -a log_reviews.txt
+scrapy crawl musinsa__item_details \
+	-a csv_path_or_dir=out/musinsa/musinsa_items/
+	-a review_page_limit=5 -a "review_order=유용한 순" \
+	-s USE_DATABASE=1 -s DB_TYPE=PostgreSQL -s DB_NAME=musinsa_scrape \
+	-s DB_HOSTNAME=localhost -s DB_USERNAME=dbuser -s "DB_PASSWORD=top secret" \
+	-s JOBDIR=out/crawls/musinsa/detailsreviews/0/ \
+	2>&1 | tee -a log_detailsnreviews.txt
 ```
 
+Since there may be many pages of reviews, a limit to how many pages will be scraped can be set with the `review_page_limit` argument.
 `review_order` must be one of:
 - "유용한 순"
 - "최신순"
 - "댓글순"
 - "높은 평점 순"
 - "낮은 평점 순"
-
-- [ ] TODO implement way to store scraped review data
 

@@ -50,7 +50,8 @@ class MusinsaItemDetailsSpider(scrapy.Spider):
                     d['url'] = url
                     d['goods_no'] = row['data_no']
                     self.item_list.append(d)
-        self.item_list = [{'url': "https://www.musinsa.com/app/goods/996177", 'goods_no': '996177'}]
+        #self.item_list = [{'url': "https://www.musinsa.com/app/goods/996177", 'goods_no': '996177'}]
+        self.items_count = len(self.item_list)
         self.review_order = review_order
         self.review_page_limit = int(review_page_limit)
         self.__delay_http_codes_default = {403: 100}
@@ -58,13 +59,18 @@ class MusinsaItemDetailsSpider(scrapy.Spider):
 
     def start_requests(self):
         start_req_objs = []
-        for item in self.item_list:
+        for iitem, item in enumerate(self.item_list):
             start_req_objs.append(Request(item['url'], callback=self.parse,
                 meta={**item, 'delay_http_codes': self.__delay_http_codes_default,
-                    'musinsa__item_details_page': True}))
+                    'musinsa__item_details_page': True,
+                    'musinsa__item_crawl_index': iitem}))
         return start_req_objs
 
     async def parse(self, response):
+        crawl_idx = response.meta.get('musinsa__item_crawl_index', -2)
+        self.logger.info("Parsing Musinsa item details %d/%d [%.02f%%] (%s)",
+                crawl_idx+1, self.items_count, 100*(crawl_idx/self.items_count),
+                response.meta.get('goods_no', "?"))
         goods_no = response.meta['goods_no']
         # stateAll, stateAllV2
         stateall = None
@@ -88,6 +94,7 @@ class MusinsaItemDetailsSpider(scrapy.Spider):
         essential = json.loads(additional_response[0][1].text)
         actualsize = json.loads(additional_response[1][1].text)
         yield MusinsaItemDetailsItem({
+                'goods_no': goods_no,
                 'stateall': stateall,
                 'stateallv2': stateallv2,
                 'essential': essential,

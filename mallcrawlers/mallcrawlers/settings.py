@@ -62,9 +62,9 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "mallcrawlers.pipelines.MallcrawlersPipeline": 300,
-#}
+ITEM_PIPELINES = {
+    "mallcrawlers.pipelines.MallcrawlersPipeline": 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -96,3 +96,12 @@ FEED_EXPORT_ENCODING = "utf-8"
 # Custom settings
 USER_AGENT_CHROME_WIN10 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
 
+USE_DATABASE = False
+DB_TYPE = 'PostgreSQL'
+DB_HOSTNAME = 'localhost'
+DB_USERNAME = 'mydbuser'
+DB_PASSWORD = 'topsecret'
+DB_NAME = 'databasename'
+
+# Musinsa settings
+MUSINSA__SKIP_SEEN_ITEMS = True
