@@ -35,8 +35,8 @@ class MallcrawlersPipeline:
             if db_type == 'PostgreSQL':
                 self.conn = psycopg2.connect(host=db_hostname, user=db_username, password=db_password, dbname=db_name)
                 self.cur = self.conn.cursor()
-        else:
-            raise ValueError("Unsupported database type: '{}'".format(db_type))
+            else:
+                raise ValueError("Unsupported database type: '{}'".format(db_type))
 
         if self.use_db:
             # Musinsa - item details table

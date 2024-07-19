@@ -23,7 +23,7 @@ class MusinsaItemDetailsSpider(scrapy.Spider):
         super().update_settings(settings)
         settings.set("USER_AGENT", settings['USER_AGENT_CHROME_WIN10'], priority='spider')
 
-    def __init__(self, csv_path_or_dir, review_order="최신순", review_page_limit=-1):
+    def __init__(self, csv_path_or_dir, review_order="최신순", review_page_limit=-1, wait_on_403=100):
         csv_paths = []
         if osp.isdir(csv_path_or_dir):
             csv_paths.extend(Path(csv_path_or_dir).iterdir())
@@ -54,7 +54,7 @@ class MusinsaItemDetailsSpider(scrapy.Spider):
         self.items_count = len(self.item_list)
         self.review_order = review_order
         self.review_page_limit = int(review_page_limit)
-        self.__delay_http_codes_default = {403: 100}
+        self.__delay_http_codes_default = {403: float(wait_on_403)}
         super().__init__()
 
     def start_requests(self):
