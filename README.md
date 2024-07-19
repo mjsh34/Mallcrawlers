@@ -4,6 +4,7 @@
 - `scrapy==2.11.1`
 - `pyyaml` (6.0.1)
 - `psycopg2` (2.9.9)
+- `pandas` (2.2.2)
 
 ### For prototype
 - `requests` (2.31.0)
