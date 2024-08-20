@@ -1,3 +1,6 @@
+Web crawlers for various shopping malls, such as [MUSINSA](https://musinsa.com/).
+
+
 # Installation
 ## Packages
 - Python 3 (3.10.12)
