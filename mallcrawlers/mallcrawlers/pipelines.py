@@ -47,6 +47,7 @@ class MallcrawlersPipeline:
                 stateall TEXT,
                 stateallv2 TEXT,
                 essential TEXT,
+                actualsize TEXT,
                 saved_date DATE
             )
             """)
@@ -93,10 +94,10 @@ class MallcrawlersPipeline:
                     dumpf = partial(json.dumps, ensure_ascii=False)
                     self.cur.execute("""
                     INSERT INTO musinsa__item_details
-                    (goods_no, stateall, stateallv2, essential, saved_date) VALUES
-                    (%s,       %s,       %s,         %s,        %s        )
+                    (goods_no, stateall, stateallv2, essential, actualsize, saved_date) VALUES
+                    (%s,       %s,       %s,         %s,        %s,         %s)
                     """, 
-                    (item['goods_no'], dumpf(item['stateall']), dumpf(item['stateallv2']), dumpf(item['essential']),
+                    (item['goods_no'], dumpf(item['stateall']), dumpf(item['stateallv2']), dumpf(item['essential']), dumpf(item['actualsize']),
                         datetime.datetime.now().strftime("%Y-%m-%d")));
                     self.conn.commit()
                     spider.logger.info("Inserted item details (goods_no='%s') into database", item['goods_no'])
